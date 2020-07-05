@@ -1,7 +1,8 @@
-var User = require("../Models/User");
+const User = require("../Models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
+require("dotenv").config();
 
 exports.signup = (req, res) => {
   // EXPRESS-VALIDATOR ERRORS CHECKING
@@ -37,36 +38,41 @@ exports.signin = (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
   }
-  const { email, password } = req.body;
-  User.findOne({ email }, function (err, user) {
-    if (err || !user) {
-      return res.status(400).json({
-        err: "USER does not exist",
-      });
+  const {email,password} = req.body;
+   //Checking if the user has registered or not
+   User.findOne({
+    email
+}).then((user) => {
+
+    if(!user) {
+        return res.status(422).json({
+            error : "User with this email is not present"
+        })
     }
-    // IF WE FOUND A USER IN THE DATABASE THEN CREATE A TOKEN AND RETURN IT
-    jwt.sign(
-      {
-        data: "foobar",
-      },
-      "secret",
-      { expiresIn: 60 * 60 },
-      function (err, token) {
-        if (err) {
-          console.log("Token Error", err);
+
+    bcrypt.compare(password,user.password)
+    .then((isMatch) => {
+        if(isMatch) { 
+            //If password matches then issue a token depending upon the payload given
+            const token = jwt.sign({
+                _id : user._id
+            },process.env.SECRET)
+            
+            const {_id,email,password} = user;
+            res.json({
+                token ,
+                user : {_id,email,password}
+            })
         }
-        return res.json({ token, user });
-      }
-    );
-  });
+        else {
+            res.json({
+                error : "Sorry Incorrect Email/Password"
+            })
+        }
+    }).catch((err) => {
+        console.log(err);
+    })
+})
 };
 
-// CUSTOM MIDDLEWARE
-exports.isAdmin = (req, res, next) => {
-  if (req.params.role == 0) {
-    return res.status(403).json({
-      error: "You are not ADMIN, Access denied",
-    });
-  }
-  next();
-};
+
