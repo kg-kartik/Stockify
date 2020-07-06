@@ -75,4 +75,13 @@ exports.signin = (req, res) => {
 })
 };
 
+exports.dashboard = (req,res) => {
+  User.findById(req.user._id)
+  .then((user) => {
+    res.status(200).json(user);
+  }).catch((err) => {
+    res.json(err);
+  })
+}
+
 

@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const User = require("../Models/User")
+const User = require("../Models/User");
 
 module.exports = (req,res,next) => {
     const {authorization} = req.headers;
@@ -16,7 +16,7 @@ module.exports = (req,res,next) => {
     //Verifying the user token for accessing protected pages
     //which user gets after successful login
 
-    jwt.verify(token,secret,(err,payload) => {
+    jwt.verify(token,process.env.SECRET,(err,payload) => {
         if(err) {
             res.status(422).json({
                 error : "You must be logged in"
