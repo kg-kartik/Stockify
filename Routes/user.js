@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../Models/User");
 const { body } = require("express-validator");
-const { signin, signup,dashboard} = require("../Controllers/user");
+const { signin, signup, dashboard, signout } = require("../Controllers/user");
 const requireLogin = require("../Authentication/requireLogin");
 
 // SIGNUP ROUTE
@@ -29,6 +29,8 @@ router.post(
   signin
 );
 
-router.get("/getUser",requireLogin,dashboard);
+router.post("/signout", signout);
+
+router.get("/getUser", requireLogin, dashboard);
 
 module.exports = router;

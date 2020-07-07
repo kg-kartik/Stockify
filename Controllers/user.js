@@ -38,50 +38,54 @@ exports.signin = (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
   }
-  const {email,password} = req.body;
-   //Checking if the user has registered or not
-   User.findOne({
-    email
-}).then((user) => {
-
-    if(!user) {
-        return res.status(422).json({
-            error : "User with this email is not present"
-        })
+  const { email, password } = req.body;
+  //Checking if the user has registered or not
+  User.findOne({
+    email,
+  }).then((user) => {
+    if (!user) {
+      return res.status(422).json({
+        error: "User with this email is not present",
+      });
     }
 
-    bcrypt.compare(password,user.password)
-    .then((isMatch) => {
-        if(isMatch) { 
-            //If password matches then issue a token depending upon the payload given
-            const token = jwt.sign({
-                _id : user._id
-            },process.env.SECRET)
-            
-            const {_id,email,password} = user;
-            res.json({
-                token ,
-                user : {_id,email,password}
-            })
+    bcrypt
+      .compare(password, user.password)
+      .then((isMatch) => {
+        if (isMatch) {
+          //If password matches then issue a token depending upon the payload given
+          const token = jwt.sign(
+            {
+              _id: user._id,
+            },
+            process.env.SECRET
+          );
+
+          const { _id, email, password } = user;
+          res.json({
+            token,
+            user: { _id, email, password },
+          });
+        } else {
+          res.json({
+            error: "Sorry Incorrect Email/Password",
+          });
         }
-        else {
-            res.json({
-                error : "Sorry Incorrect Email/Password"
-            })
-        }
-    }).catch((err) => {
+      })
+      .catch((err) => {
         console.log(err);
-    })
-})
+      });
+  });
 };
 
-exports.dashboard = (req,res) => {
+exports.dashboard = (req, res) => {
   User.findById(req.user._id)
-  .then((user) => {
-    res.status(200).json(user);
-  }).catch((err) => {
-    res.json(err);
-  })
-}
+    .then((user) => {
+      res.status(200).json(user);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+};
 
-
+exports.signout = (req, res) => {};
