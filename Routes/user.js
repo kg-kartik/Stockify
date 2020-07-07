@@ -29,8 +29,6 @@ router.post(
   signin
 );
 
-router.post("/signout", signout);
-
 router.get("/getUser", requireLogin, dashboard);
 
 module.exports = router;
