@@ -88,4 +88,24 @@ exports.dashboard = (req, res) => {
     });
 };
 
-exports.signout = (req, res) => {};
+exports.updateUser = (req,res) => {
+ User.findById(req.user._id)
+ .then((user) => {
+   if(req.body.name) {
+     user.name = req.body.name;
+   }
+   if(req.body.email) {
+     user.email = req.body.email;
+   }
+   if(req.body.password) {
+     user.password = req.body.password;
+   }
+   user.save()
+   .then((user) => {
+     res.status(200).json(user)
+   })
+ })
+  .catch((err) => {
+    res.json(err);
+  })
+}

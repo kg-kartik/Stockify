@@ -22,26 +22,6 @@ router.post("/create",requireLogin,(req,res) => {
         })
     })
 
-//Updating the stockData using the particular stock id
-// POST /stocks/update
-// @Protected
-// router.post("/update",requireLogin,(req,res) =>{
-//     User.findByIdAndUpdate(req.user.id)
-//     .then(() => {
-//         User.update({"stockData._id": req.body._id}, {$set: {
-//             'stockData.$.name': req.body.name,
-//             'stockData.$.quantity': req.body.quantity,
-//             'stockData.$.price': req.body.price
-//         }}).then((user) => {
-//             res.status(200).json(user);
-//         }).catch((err) => {
-//             res.status(422).json(err);
-//         })
-//     }).catch((err) => {
-//         res.json(err);
-//     })
-// })
-
 router.post("/update",requireLogin,(req,res) => {
     const {_id,name,quantity,price} = req.body;
 
@@ -54,11 +34,10 @@ router.post("/update",requireLogin,(req,res) => {
 
     User.findById(req.user._id)
     .then((user) => {
-        user.stockData = user.StockData.filter((stock) => {
-            stock._id !== req.body._id 
-        })
-        console.log(user,"hello");
-        user.stockData = stockData;
+        index = user.stockData.findIndex((stock => 
+            stock._id == req.body._id
+        ))
+        user.stockData[index] = stockData;       
         user.save()
         .then((user) => {
             res.json(user);
@@ -73,17 +52,21 @@ router.post("/update",requireLogin,(req,res) => {
 // @Protected
 router.post("/delete",requireLogin,(req,res) => {
     User.findById(req.user._id)
-    .then(() => {
-        User.update({'stockData._id': req.body._id}, {'$unset': {
-            'stockData.$._id': "",
-            'stockData.$.name': "",
-            'stockData.$.quantity': "",
-            'stockData.$.price': ""
-        }}).then((user) => {
+    .then((user) => {
+        index = user.stockData.findIndex((stock => 
+            stock._id == req.body._id
+        ))
+        console.log(index);
+        // delete user.StockData[index];
+        user.stockData[index] = {};
+
+        console.log(user);
+        user.save()
+        .then((user) => {
             res.status(200).json(user);
-        }).catch((err) => {
-            res.status(422).json(err);
         })
+    }).catch((err) => {
+        res.json(err);
     })
 })
 
