@@ -2,10 +2,13 @@ const express = require("express");
 const router = express.Router();
 const User = require("../Models/User");
 const { body } = require("express-validator");
-const { signin, signup, dashboard, signout } = require("../Controllers/user");
+const { signin, signup, dashboard, signout,updateUser } = require("../Controllers/user");
 const requireLogin = require("../Authentication/requireLogin");
 
-// SIGNUP ROUTE
+
+//Registering a user
+// Post /api/signup
+// @Public
 router.post(
   "/signup",
   [
@@ -19,7 +22,9 @@ router.post(
   signup
 );
 
-// SIGNIN ROUTE
+//Signning in a user
+// Post /api/signin
+// @Public
 router.post(
   "/signin",
   [
@@ -29,8 +34,23 @@ router.post(
   signin
 );
 
-router.post("/signout", signout);
-
+//Get User Details
+// Post /api/getUser
+// @Protected
 router.get("/getUser", requireLogin, dashboard);
+
+//Updating a user
+// Post /api/update
+// @Protected
+ router.post("/update",
+ [
+  body("name", "Please provide a valid name").not().isEmpty(),
+  body("email", "Please provide a valid email address").isEmail(),
+  body(
+    "password",
+    "Please provide a password altleast 6 characters long"
+  ).isLength({ min: 6 }),
+ ],
+ requireLogin,updateUser);
 
 module.exports = router;
