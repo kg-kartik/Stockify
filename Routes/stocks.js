@@ -22,6 +22,10 @@ router.post("/create",requireLogin,(req,res) => {
         })
     })
 
+//Updating a particular stock item
+// Post /stocks/update
+// @Protected
+
 router.post("/update",requireLogin,(req,res) => {
     const {_id,name,quantity,price} = req.body;
 
@@ -69,6 +73,5 @@ router.post("/delete",requireLogin,(req,res) => {
         res.json(err);
     })
 })
-
 
 module.exports = router;

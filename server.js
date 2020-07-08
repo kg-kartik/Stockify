@@ -13,7 +13,12 @@ var port = process.env.PORT || 8000;
 // CONNECTION OF DATABASE WITH MONGOOSE
 mongoose.connect(
   process.env.DATABASE,
-  { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true },
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+  },
   function (error) {
     if (error) throw error; // Handle failed connection
     console.log("Database connected  " + mongoose.connection.readyState);
@@ -22,7 +27,7 @@ mongoose.connect(
 
 // ROUTES AS MIDDLEWARES
 app.use("/api", require("./Routes/user"));
-app.use("/stocks",require("./Routes/stocks"));
+app.use("/stocks", require("./Routes/stocks"));
 
 // LISTENING TO PORT
 app.listen(port, (req, res) => {
