@@ -78,6 +78,7 @@ exports.signin = (req, res) => {
   });
 };
 
+//Get details of logged in user
 exports.dashboard = (req, res) => {
   User.findById(req.user._id)
     .then((user) => {
@@ -89,8 +90,15 @@ exports.dashboard = (req, res) => {
 };
 
 exports.updateUser = (req,res) => {
+  //express validators checking
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
  User.findById(req.user._id)
  .then((user) => {
+
+  //Only updating fields if given by the user else keeping the previous ones
    if(req.body.name) {
      user.name = req.body.name;
    }
@@ -98,7 +106,10 @@ exports.updateUser = (req,res) => {
      user.email = req.body.email;
    }
    if(req.body.password) {
-     user.password = req.body.password;
+      // hashing the password
+      var salt = bcrypt.genSaltSync(10);
+      var hash = bcrypt.hashSync(req.body.password, salt);
+      user.password = hash;
    }
    user.save()
    .then((user) => {
