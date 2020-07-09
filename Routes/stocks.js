@@ -5,9 +5,17 @@ const requireLogin = require("../Authentication/requireLogin");
 
 //Adding warehouse qauntity
 router.post("/addwarehouse",requireLogin,(req,res) => {
+
     User.findById(req.user._id)
     .then((user) => {
-        res.status(200).json(user);
+        user.warehouseNo = req.body.warehouseNo;
+        
+        user.save()
+        .then((user) => {
+            res.status(200).json(user)
+        }).catch((err) => {
+            res.json(err);
+        })
     }).catch((err) => {
         res.json(err);
     })
@@ -22,7 +30,7 @@ router.post("/updatewarehouse",requireLogin,(req,res) => {
         
         user.save()
         .then((user) => {
-            res.json(200).json(user)
+            res.status(200).json(user)
         }).catch((err) => {
             res.json(err);
         })
@@ -88,15 +96,13 @@ router.post("/delete",requireLogin,(req,res) => {
         index = user.stockData.findIndex((stock => 
             stock._id == req.body._id
         ))
-        console.log(index);
         // delete user.StockData[index];
         (user.stockData[index]._id).toString = "";
         user.stockData[index].name = "";
         user.stockData[index].price = "";
         user.stockData[index].quantity = "";
-        user.stockData[index].stockOwner = ""
-
-        console.log(user);
+        user.stockData[index].stockOwner = "";
+        
         user.save()
         .then((user) => {
             res.status(200).json(user);
