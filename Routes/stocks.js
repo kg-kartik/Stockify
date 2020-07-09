@@ -3,6 +3,33 @@ const router = express.Router();
 const User = require("../Models/User");
 const requireLogin = require("../Authentication/requireLogin");
 
+//Adding warehouse qauntity
+router.post("/addwarehouse",requireLogin,(req,res) => {
+    User.findById(req.user._id)
+    .then((user) => {
+        res.status(200).json(user);
+    }).catch((err) => {
+        res.json(err);
+    })
+})
+
+//Update Warehouse quantity 
+router.post("/updatewarehouse",requireLogin,(req,res) => {
+
+    User.findById(req.user._id)
+    .then((user) => {
+        user.warehouseNo = req.body.warehouseNo;
+        
+        user.save()
+        .then((user) => {
+            res.json(200).json(user)
+        }).catch((err) => {
+            res.json(err);
+        })
+    }).catch((err) => {
+        res.json(err);
+    })
+})
 
 //Pushing the stockData to the users srray
 // Post /stocks/update
@@ -27,13 +54,14 @@ router.post("/create",requireLogin,(req,res) => {
 // @Protected
 
 router.post("/update",requireLogin,(req,res) => {
-    const {_id,name,quantity,price} = req.body;
+    const {_id,name,quantity,price,stockOwner} = req.body;
 
     const stockData = {
         _id,
         name,
         quantity,
-        price
+        price,
+        stockOwner
     }
 
     User.findById(req.user._id)
@@ -62,7 +90,11 @@ router.post("/delete",requireLogin,(req,res) => {
         ))
         console.log(index);
         // delete user.StockData[index];
-        user.stockData[index] = {};
+        (user.stockData[index]._id).toString = "";
+        user.stockData[index].name = "";
+        user.stockData[index].price = "";
+        user.stockData[index].quantity = "";
+        user.stockData[index].stockOwner = ""
 
         console.log(user);
         user.save()
